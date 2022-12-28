@@ -2,6 +2,8 @@ package io.debc.nft.entity;
 
 import lombok.Data;
 
+import java.math.BigInteger;
+
 /**
  * @description:
  * @author: Jalivv

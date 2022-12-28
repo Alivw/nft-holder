@@ -11,9 +11,11 @@ import io.debc.nft.thread.Pool;
 import io.debc.nft.thread.TConsumer;
 import io.debc.nft.utils.EsQueryUtils;
 import io.debc.nft.utils.SysUtils;
+import io.debc.nft.utils.Web3Utils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static io.debc.nft.config.ConfigurableConstants.*;
 
@@ -35,17 +37,17 @@ public class Main {
         long t = EsQueryUtils.getMaxBlock() - REPEAT;
         long lastExecNumber = t > 0 ? t : 0;
         log.info("get lastExec block :{}", lastExecNumber);
-        pool.execute(new TConsumer(producer, 13079343, eventHandlers));
-        //while (true) {
-        //    long ethBlockNumber = Web3Utils.getEthBlockNumber();
-        //    if (lastExecNumber < ethBlockNumber) {
-        //        for (long i = lastExecNumber + 1; i <= ethBlockNumber; i++) {
-        //            pool.execute(new TConsumer(producer, i, eventHandler));
-        //        }
-        //    }
-        //    lastExecNumber = ethBlockNumber;
-        //    TimeUnit.SECONDS.sleep(MAIN_SLEEP_SECONDS);
-        //}
+        pool.execute(new TConsumer(producer, 13079362, eventHandlers));
+        while (true) {
+            long ethBlockNumber = Web3Utils.getEthBlockNumber();
+            if (lastExecNumber < ethBlockNumber) {
+                for (long i = 13079343; i <= 13079443; i++) {
+                    pool.execute(new TConsumer(producer, i, eventHandlers));
+                }
+            }
+            lastExecNumber = ethBlockNumber;
+            TimeUnit.SECONDS.sleep(MAIN_SLEEP_SECONDS);
+        }
 
 
     }

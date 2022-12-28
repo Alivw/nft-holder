@@ -1,5 +1,8 @@
 package io.debc.nft.handler;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.LoadingCache;
+import io.debc.nft.config.CacheConfig;
 import io.debc.nft.entity.NFTBalance;
 import org.web3j.protocol.core.methods.response.Log;
 
@@ -7,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @description:
@@ -15,7 +19,7 @@ import java.util.Set;
  **/
 public interface EventHandler {
 
-
+    LoadingCache<String, Integer> contractCache = CacheConfig.getContractCache();
     /**
      * see https://www.4byte.directory/event-signatures/?page=126&sort=id <br/>
      * Transfer: 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef

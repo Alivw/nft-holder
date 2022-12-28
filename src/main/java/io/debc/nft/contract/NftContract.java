@@ -66,6 +66,9 @@ public abstract class NftContract implements Contract {
         Transaction transaction = Transaction.createEthCallTransaction(null, contractAddress, data);
         Request<?, EthCall> request = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST);
         EthCall ethCall = request.send();
+        if (ethCall.getResult() == null || ethCall.getResult().equals("0x")) {
+            return false;
+        }
         Tuple tuple = supportInterfaceFunc.decodeReturn(FastHex.decode(ethCall.getResult().substring(2)));
         return tuple.get(0);
     }

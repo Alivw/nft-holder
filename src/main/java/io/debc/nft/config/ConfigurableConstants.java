@@ -32,7 +32,7 @@ public class ConfigurableConstants {
     public static final String ENV = SysUtils.getSystemEnv("RUN_ENV", "DOCKER");
 
     public static final String DATASOURCE = SysUtils.getSystemEnv("DATASOURCE", "geth");
-    public static final int MAIN_SLEEP_SECONDS = Integer.parseInt(SysUtils.getSystemEnv("MAIN_SLEEP_SECONDS", "4"));
+    public static final int MAIN_SLEEP_SECONDS = Integer.parseInt(SysUtils.getSystemEnv("MAIN_SLEEP_SECONDS", "6000"));
     public static final int REPEAT = Integer.parseInt(SysUtils.getSystemEnv("REPEAT", "2000"));
 
 

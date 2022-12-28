@@ -46,15 +46,20 @@ public class TConsumer extends Thread {
             for (Map.Entry<String, List<Log>> entry : logMap.entrySet()) {
                 for (EventHandler eventHandler : eventHandlers) {
                     if (eventHandler.canHandle(entry.getKey())) {
-                        List<NFTBalance> handleBalances = eventHandler.handle(entry.getValue());
-                        if (!CollectionUtils.isEmpty(handleBalances)) {
-                            nftBalances.addAll(handleBalances);
+                        try {
+                            List<NFTBalance> handleBalances = eventHandler.handle(entry.getValue());
+                            if (!CollectionUtils.isEmpty(handleBalances)) {
+                                nftBalances.addAll(handleBalances);
+                            }
+                        } catch (Exception e) {
+                            log.error("exec block error: {}",blockNumber,e);
                         }
+
                     }
                 }
             }
+            System.out.println(nftBalances);
 
-            pool.execute(() -> EsQueryUtils.put(blockNumber));
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
     }
