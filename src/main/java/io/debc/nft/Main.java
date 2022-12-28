@@ -37,22 +37,24 @@ public class Main {
         long t = ESUtils.getMaxBlock() - REPEAT;
         long lastExecNumber = t > 0 ? t : 0;
         log.info("get lastExec block :{}", lastExecNumber);
-        pool.execute(new TConsumer(producer, 13079362, eventHandlers));
-        while (true) {
-            EventHandler.nftHasHandleCache.cleanUp();
-            EventHandler.contractCache.cleanUp();
-            log.info("start time : {}", System.currentTimeMillis());
-            long ethBlockNumber = Web3Utils.getEthBlockNumber();
-            if (lastExecNumber < ethBlockNumber) {
-                for (long i = lastExecNumber + 1; i <= ethBlockNumber; i++) {
-                    pool.execute(new TConsumer(producer, i, eventHandlers));
-                }
-            }
-            lastExecNumber = ethBlockNumber;
-            TimeUnit.SECONDS.sleep(MAIN_SLEEP_SECONDS);
+        //pool.execute(new TConsumer(producer, 13079362, eventHandlers));
+        //while (true) {
+        //    EventHandler.nftHasHandleCache.cleanUp();
+        //    EventHandler.contractCache.cleanUp();
+        //    log.info("start time : {}", System.currentTimeMillis());
+        //    long ethBlockNumber = Web3Utils.getEthBlockNumber();
+        //    if (lastExecNumber < ethBlockNumber) {
+        //        for (long i = lastExecNumber + 1; i <= ethBlockNumber; i++) {
+        //            pool.execute(new TConsumer(producer, i, eventHandlers));
+        //        }
+        //    }
+        //    lastExecNumber = ethBlockNumber;
+        //    TimeUnit.SECONDS.sleep(MAIN_SLEEP_SECONDS);
+        //}
+        long ethBlockNumber = Web3Utils.getEthBlockNumber();
+        for (long i = 0; i <= ethBlockNumber; i++) {
+            pool.execute(new TConsumer(producer, i, eventHandlers));
         }
-
-
     }
 
     private static Producer getProducer() {
