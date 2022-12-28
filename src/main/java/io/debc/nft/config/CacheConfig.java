@@ -1,6 +1,6 @@
 package io.debc.nft.config;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.debc.nft.contract.Erc721Contract;
@@ -18,13 +18,13 @@ public class CacheConfig {
     public static LoadingCache<String, Integer> getContractCache() {
         return Caffeine.newBuilder().maximumSize(1_000_000L)
                 .initialCapacity(4096)
-                .build(new CacheLoader<String, Integer>() {
-                    @Override
-                    public Integer load(String key) throws Exception {
-                        return erc721Contract.supportInterface(key) ? 1 : 0;
-                    }
-                });
+                .build(key -> erc721Contract.supportInterface(key) ? 1 : 0);
     }
 
+    public static Cache<String, Boolean> nftHasHandledCache() {
+        return Caffeine.newBuilder().maximumSize(1_000_000L)
+                .initialCapacity(4096)
+                .build();
+    }
 
 }
