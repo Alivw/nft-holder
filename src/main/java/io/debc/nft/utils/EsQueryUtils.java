@@ -209,6 +209,30 @@ public class EsQueryUtils {
     }
 
     public static void saveNFTBalanceBatch(List<NFTBalance> nftBalances) {
-
+        BulkRequest request = new BulkRequest();
+        for (NFTBalance balance : nftBalances) {
+            try {
+                IndexRequest indexRequest = new IndexRequest("nft_balance");
+                if (balance.getStd() == 0) {
+                    indexRequest.id(balance.getContract() + balance.getTokenId());
+                }else {
+                    indexRequest.id(balance.getAddress() + balance.getContract() + balance.getTokenId());
+                }
+                balance.setStd(null);
+                indexRequest.source(objectMapper.writeValueAsString(balance), XContentType.JSON);
+                request.add(indexRequest);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+         /*
+         设置刷新策略
+        */
+        //request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
+        try {
+            client.bulk(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

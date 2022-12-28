@@ -56,6 +56,7 @@ public class TransferEventHandler implements EventHandler {
             nftBalance.setAmount("1");
             nftBalance.setTokenId(tokenId);
             nftBalance.setContract(contractAddress);
+            nftBalance.setStd(0);
             ans.add(nftBalance);
         }
     }
