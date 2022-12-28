@@ -34,6 +34,7 @@ public class TransferEventHandler implements EventHandler {
                     Boolean nftHasHandled = nftHasHandleCache.getIfPresent(contractAddress + tokenId);
                     if (nftHasHandled == null) {
                         addNFTBalance(ans, contractAddress, tokenId);
+                        nftHasHandleCache.put(contractAddress + tokenId, true);
                     }
                 }
 
