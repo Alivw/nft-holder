@@ -27,6 +27,7 @@ import org.elasticsearch.search.aggregations.metrics.StatsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +43,7 @@ import static io.debc.nft.utils.SysUtils.objectMapper;
  * @create: 2022-12-09 11:05
  **/
 
-public class EsQueryUtils {
+public class ESUtils {
 
     private static final RestHighLevelClient client = EsConfig.newClientInstance(true);
     private static final ConcurrentHashMap<String, EsContract> cache = new ConcurrentHashMap(6000000);
@@ -215,10 +216,12 @@ public class EsQueryUtils {
         for (NFTBalance balance : nftBalances) {
             try {
                 IndexRequest indexRequest = new IndexRequest("nft_balance");
+                String tokenId = balance.getTokenId();
+                balance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
                 if (balance.getStd() == 0) {
-                    indexRequest.id(Md5Crypt.md5Crypt((balance.getContract() + balance.getTokenId()).getBytes(StandardCharsets.UTF_8), "721"));
+                    indexRequest.id(balance.getContract() + balance.getTokenId());
                 } else {
-                    indexRequest.id(Md5Crypt.md5Crypt((balance.getAddress() + balance.getContract() + balance.getTokenId()).getBytes(StandardCharsets.UTF_8), "1155"));
+                    indexRequest.id(balance.getAddress() + balance.getContract() + balance.getTokenId());
                 }
                 balance.setStd(null);
                 indexRequest.source(objectMapper.writeValueAsString(balance), XContentType.JSON);

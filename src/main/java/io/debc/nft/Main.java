@@ -9,7 +9,7 @@ import io.debc.nft.product.Producer;
 import io.debc.nft.product.Web3;
 import io.debc.nft.thread.Pool;
 import io.debc.nft.thread.TConsumer;
-import io.debc.nft.utils.EsQueryUtils;
+import io.debc.nft.utils.ESUtils;
 import io.debc.nft.utils.SysUtils;
 import io.debc.nft.utils.Web3Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class Main {
 
         Producer producer = getProducer();
         Pool pool = new Pool(PRODUCE_CORE_SIZE, PRODUCE_QUEUE_SIZE, "produce");
-        long t = EsQueryUtils.getMaxBlock() - REPEAT;
+        long t = ESUtils.getMaxBlock() - REPEAT;
         long lastExecNumber = t > 0 ? t : 0;
         log.info("get lastExec block :{}", lastExecNumber);
         pool.execute(new TConsumer(producer, 13079362, eventHandlers));

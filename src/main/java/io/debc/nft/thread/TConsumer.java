@@ -4,7 +4,7 @@ import io.debc.nft.entity.NFTBalance;
 import io.debc.nft.handler.EventHandler;
 import io.debc.nft.product.Producer;
 import io.debc.nft.utils.CollectionUtils;
-import io.debc.nft.utils.EsQueryUtils;
+import io.debc.nft.utils.ESUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.Log;
 
@@ -60,7 +60,7 @@ public class TConsumer extends Thread {
                 }
             }
             if (!nftBalances.isEmpty()) {
-                EsQueryUtils.saveNFTBalanceBatch(nftBalances);
+                ESUtils.saveNFTBalanceBatch(nftBalances);
             }
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
