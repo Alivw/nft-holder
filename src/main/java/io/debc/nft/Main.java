@@ -39,7 +39,7 @@ public class Main {
         log.info("get lastExec block :{}", lastExecNumber);
         pool.execute(new TConsumer(producer, 13079362, eventHandlers));
         while (true) {
-            long s = System.currentTimeMillis();
+            log.info("start time : {}", System.currentTimeMillis());
             long ethBlockNumber = Web3Utils.getEthBlockNumber();
             if (lastExecNumber < ethBlockNumber) {
                 for (long i = 13079343; i <= 13079443; i++) {
@@ -47,7 +47,6 @@ public class Main {
                 }
             }
             lastExecNumber = ethBlockNumber;
-            log.info("complete 100 block : {}", System.currentTimeMillis() - s);
             TimeUnit.SECONDS.sleep(MAIN_SLEEP_SECONDS);
         }
 

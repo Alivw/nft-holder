@@ -60,6 +60,9 @@ public class TConsumer extends Thread {
             }
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
+        if (blockNumber == 13079443) {
+            log.info("end time : {}", System.currentTimeMillis());
+        }
     }
 
 }

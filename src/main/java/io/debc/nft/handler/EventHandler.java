@@ -1,7 +1,6 @@
 package io.debc.nft.handler;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.debc.nft.config.CacheConfig;
 import io.debc.nft.entity.NFTBalance;
 import org.web3j.protocol.core.methods.response.Log;
@@ -10,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @description:
