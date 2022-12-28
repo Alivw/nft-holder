@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.debc.nft.config.EsConfig;
 import io.debc.nft.entity.EsBalance;
 import io.debc.nft.entity.EsContract;
+import io.debc.nft.entity.NFTBalance;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -205,5 +206,9 @@ public class EsQueryUtils {
             esContract.setStandard(Collections.singletonList("unknown"));
             cache.put(contractAddress, esContract);
         }
+    }
+
+    public static void saveNFTBalanceBatch(List<NFTBalance> nftBalances) {
+
     }
 }

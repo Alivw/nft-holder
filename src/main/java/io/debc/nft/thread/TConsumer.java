@@ -52,16 +52,16 @@ public class TConsumer extends Thread {
                                 nftBalances.addAll(handleBalances);
                             }
                         } catch (Exception e) {
-                            log.error("exec block error: {}",blockNumber,e);
+                            log.error("exec block error: {}", blockNumber, e);
+                            System.exit(500);
                         }
 
                     }
                 }
             }
+
+            EsQueryUtils.saveNFTBalanceBatch(nftBalances);
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
-        }
-        if (blockNumber == 13099443) {
-            log.info("end time : {}", System.currentTimeMillis());
         }
     }
 
