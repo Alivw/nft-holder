@@ -63,6 +63,9 @@ public class TConsumer extends Thread {
                 ESUtils.saveNFTBalanceBatch(nftBalances);
             }
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
+            if (blockNumber == 13099443) {
+                log.info("end time : {}", System.currentTimeMillis());
+            }
         }
     }
 
