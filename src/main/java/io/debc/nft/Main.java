@@ -34,9 +34,9 @@ public class Main {
 
         Producer producer = getProducer();
         Pool pool = new Pool(PRODUCE_CORE_SIZE, PRODUCE_QUEUE_SIZE, "produce");
-        long t = ESUtils.getMaxBlock() - REPEAT;
-        long lastExecNumber = t > 0 ? t : 0;
-        log.info("get lastExec block :{}", lastExecNumber);
+        //long t = ESUtils.getMaxBlock() - REPEAT;
+        //long lastExecNumber = t > 0 ? t : 0;
+        //log.info("get lastExec block :{}", lastExecNumber);
         //pool.execute(new TConsumer(producer, 13079362, eventHandlers));
         //while (true) {
         //    EventHandler.nftHasHandleCache.cleanUp();
