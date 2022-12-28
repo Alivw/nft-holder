@@ -59,7 +59,9 @@ public class TConsumer extends Thread {
                     }
                 }
             }
-            EsQueryUtils.saveNFTBalanceBatch(nftBalances);
+            if (!nftBalances.isEmpty()) {
+                EsQueryUtils.saveNFTBalanceBatch(nftBalances);
+            }
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
     }
