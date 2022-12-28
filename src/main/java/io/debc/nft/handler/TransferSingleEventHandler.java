@@ -22,6 +22,7 @@ public class TransferSingleEventHandler implements EventHandler {
 
     @Override
     public List<NFTBalance> handle(List<Log> logs) {
+
         return null;
     }
 }

@@ -1,5 +1,8 @@
 package io.debc.nft.utils;
 
+import com.esaulpaugh.headlong.abi.Tuple;
+import com.esaulpaugh.headlong.abi.TupleType;
+import com.esaulpaugh.headlong.util.FastHex;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.reflections.Reflections;
@@ -52,5 +55,11 @@ public class SysUtils {
             }
         }
         return ans;
+    }
+
+    public static String decodeTransferSingleData(String data) {
+        TupleType tupleType = TupleType.parse("(uint256,uint256)");
+        Tuple decode = tupleType.decode(FastHex.decode(data));
+        return decode.get(0);
     }
 }
