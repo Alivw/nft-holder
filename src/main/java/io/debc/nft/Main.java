@@ -39,10 +39,12 @@ public class Main {
         log.info("get lastExec block :{}", lastExecNumber);
         pool.execute(new TConsumer(producer, 13079362, eventHandlers));
         while (true) {
+            EventHandler.nftHasHandleCache.cleanUp();
+            EventHandler.contractCache.cleanUp();
             log.info("start time : {}", System.currentTimeMillis());
             long ethBlockNumber = Web3Utils.getEthBlockNumber();
             if (lastExecNumber < ethBlockNumber) {
-                for (long i = 13079343; i <= 13079443; i++) {
+                for (long i = 13079343; i <= 13099443; i++) {
                     pool.execute(new TConsumer(producer, i, eventHandlers));
                 }
             }

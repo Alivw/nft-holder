@@ -37,7 +37,6 @@ public class TransferEventHandler implements EventHandler {
                         nftHasHandleCache.put(contractAddress + tokenId, true);
                     }
                 }
-
             }
         }
         return ans;
