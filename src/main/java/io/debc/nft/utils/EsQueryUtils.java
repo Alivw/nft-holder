@@ -5,6 +5,7 @@ import io.debc.nft.config.EsConfig;
 import io.debc.nft.entity.EsBalance;
 import io.debc.nft.entity.EsContract;
 import io.debc.nft.entity.NFTBalance;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -26,6 +27,7 @@ import org.elasticsearch.search.aggregations.metrics.StatsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -214,9 +216,9 @@ public class EsQueryUtils {
             try {
                 IndexRequest indexRequest = new IndexRequest("nft_balance");
                 if (balance.getStd() == 0) {
-                    indexRequest.id(balance.getContract() + balance.getTokenId());
-                }else {
-                    indexRequest.id(balance.getAddress() + balance.getContract() + balance.getTokenId());
+                    indexRequest.id(Md5Crypt.md5Crypt((balance.getContract() + balance.getTokenId()).getBytes(StandardCharsets.UTF_8), "721"));
+                } else {
+                    indexRequest.id(Md5Crypt.md5Crypt((balance.getAddress() + balance.getContract() + balance.getTokenId()).getBytes(StandardCharsets.UTF_8), "1155"));
                 }
                 balance.setStd(null);
                 indexRequest.source(objectMapper.writeValueAsString(balance), XContentType.JSON);
