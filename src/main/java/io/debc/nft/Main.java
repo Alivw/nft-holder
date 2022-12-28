@@ -44,7 +44,7 @@ public class Main {
             log.info("start time : {}", System.currentTimeMillis());
             long ethBlockNumber = Web3Utils.getEthBlockNumber();
             if (lastExecNumber < ethBlockNumber) {
-                for (long i = 13079343; i <= 13099443; i++) {
+                for (long i = lastExecNumber + 1; i <= ethBlockNumber; i++) {
                     pool.execute(new TConsumer(producer, i, eventHandlers));
                 }
             }
