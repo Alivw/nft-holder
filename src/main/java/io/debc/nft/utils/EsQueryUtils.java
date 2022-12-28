@@ -56,7 +56,7 @@ public class EsQueryUtils {
     }
 
     public static long getMaxBlock() {
-        SearchRequest searchRequest = new SearchRequest("erc20_balance_log");
+        SearchRequest searchRequest = new SearchRequest("nft_balance_log");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         StatsAggregationBuilder statsAggregationBuilder = AggregationBuilders.stats("blockNumber").field("blockNumber");
         searchSourceBuilder.aggregation(statsAggregationBuilder);
@@ -76,7 +76,7 @@ public class EsQueryUtils {
 
 
     public static void put(long blockNumber) {
-        IndexRequest request = new IndexRequest("erc20_balance_log");
+        IndexRequest request = new IndexRequest("nft_balance_log");
         request.id(String.valueOf(blockNumber));
         String json = "{\"blockNumber\":" + blockNumber + "}";
         request.source(json, XContentType.JSON);

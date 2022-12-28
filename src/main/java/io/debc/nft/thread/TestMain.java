@@ -1,6 +1,12 @@
 package io.debc.nft.thread;
 
+import com.esaulpaugh.headlong.abi.Tuple;
+import com.esaulpaugh.headlong.abi.TupleType;
+import com.esaulpaugh.headlong.util.FastHex;
+
+import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * @description:
@@ -10,12 +16,18 @@ import java.util.Arrays;
 public class TestMain {
 
     public static void main(String[] args) throws Exception {
+        String s = "0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000016123d4abd919f6c17a218546a5b35b15a7fb354b0000000000000000020010010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000a";
 
+        Tuple tuple = decode(s);
+        BigInteger[] bigIntegers = tuple.get(0);
+        Arrays.stream(bigIntegers).forEach(System.out::println);
+        System.out.println();
+    }
 
-        //System.out.println(new Erc20Contract().name("0xbb9bc244d798123fde783fcc1c72d3bb8c189413"));
-        String[] split = "192.168.31.55,192.168.31.55".split(",");
-        Arrays.stream(split).forEach(e-> System.out.println("qq"+e));
-
+    private static Tuple decode(String s) {
+        TupleType tupleType = TupleType.parse("(uint256[],uint256[])");
+        Tuple tuple = tupleType.decode(FastHex.decode(s.substring(2)));
+        return tuple;
     }
 
 

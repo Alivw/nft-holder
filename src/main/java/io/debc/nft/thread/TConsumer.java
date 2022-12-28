@@ -1,12 +1,16 @@
 package io.debc.nft.thread;
 
-import io.debc.nft.consumer.EventHandler;
+import io.debc.nft.entity.NFTBalance;
+import io.debc.nft.handler.EventHandler;
 import io.debc.nft.product.Producer;
+import io.debc.nft.utils.CollectionUtils;
 import io.debc.nft.utils.EsQueryUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.Log;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.debc.nft.config.ConfigurableConstants.BALANCE_CORE_SIZE;
 import static io.debc.nft.config.ConfigurableConstants.BALANCE_QUEUE_SIZE;
@@ -23,9 +27,11 @@ public class TConsumer extends Thread {
     private Producer producer;
     private long blockNumber;
 
-    private EventHandler eventHandler;
-    public TConsumer(Producer producer, long blockNumber,EventHandler eventHandler) {
-        this.eventHandler = eventHandler;
+    private Set<EventHandler> eventHandlers;
+
+
+    public TConsumer(Producer producer, long blockNumber, Set<EventHandler> eventHandler) {
+        this.eventHandlers = eventHandler;
         this.producer = producer;
         this.blockNumber = blockNumber;
     }
@@ -35,7 +41,19 @@ public class TConsumer extends Thread {
         List<Log> logs = producer.obtainTopics(blockNumber);
         if (!logs.isEmpty()) {
             long s = System.currentTimeMillis();
-            eventHandler.handle(logs);
+            Map<String, List<Log>> logMap = logs.stream().collect(Collectors.groupingBy(e -> e.getTopics().get(0), Collectors.mapping(Function.identity(), Collectors.toList())));
+            List<NFTBalance> nftBalances = new ArrayList<>(logs.size());
+            for (Map.Entry<String, List<Log>> entry : logMap.entrySet()) {
+                for (EventHandler eventHandler : eventHandlers) {
+                    if (eventHandler.canHandle(entry.getKey())) {
+                        List<NFTBalance> handleBalances = eventHandler.handle(entry.getValue());
+                        if (!CollectionUtils.isEmpty(handleBalances)) {
+                            nftBalances.addAll(handleBalances);
+                        }
+                    }
+                }
+            }
+
             pool.execute(() -> EsQueryUtils.put(blockNumber));
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
