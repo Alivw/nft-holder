@@ -58,8 +58,6 @@ public class TConsumer extends Thread {
                     }
                 }
             }
-            System.out.println(nftBalances);
-
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
     }
