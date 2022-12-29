@@ -12,8 +12,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.debc.nft.config.ConfigurableConstants.BALANCE_CORE_SIZE;
-import static io.debc.nft.config.ConfigurableConstants.BALANCE_QUEUE_SIZE;
 
 /**
  * @description:
@@ -23,7 +21,6 @@ import static io.debc.nft.config.ConfigurableConstants.BALANCE_QUEUE_SIZE;
 @Slf4j
 public class TConsumer extends Thread {
 
-    static Pool pool = new Pool(BALANCE_CORE_SIZE, BALANCE_QUEUE_SIZE, "putBlockNumber");
     private Producer producer;
     private long blockNumber;
 

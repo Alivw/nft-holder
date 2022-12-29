@@ -3,7 +3,6 @@ package io.debc.nft.contract;
 import com.esaulpaugh.headlong.abi.Address;
 import com.esaulpaugh.headlong.util.FastHex;
 import io.debc.nft.annotation.Contract;
-import io.debc.nft.entity.EsContract;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.request.Transaction;
@@ -25,21 +24,11 @@ public class Erc1155Contract extends NftContract {
      */
     public static final String interfaceId = "0xd9b67a26";
 
-    String s = "";
     public static final com.esaulpaugh.headlong.abi.Function balanceOfFunc = com.esaulpaugh.headlong.abi.Function.fromJson("{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}");
 
     @Override
     public String getSupportsInterfaceId() {
         return interfaceId;
-    }
-
-    @Override
-    public EsContract callContractMethods(String contractAddress) {
-        EsContract esContract = super.callContractMethods(contractAddress);
-        if (esContract != null) {
-            esContract.setStd("721");
-        }
-        return esContract;
     }
 
 

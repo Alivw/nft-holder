@@ -2,8 +2,6 @@ package io.debc.nft.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.debc.nft.config.EsConfig;
-import io.debc.nft.entity.EsBalance;
-import io.debc.nft.entity.EsContract;
 import io.debc.nft.entity.NFTBalance;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
@@ -26,7 +24,6 @@ import org.elasticsearch.search.aggregations.metrics.StatsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,8 +41,6 @@ import static io.debc.nft.utils.SysUtils.objectMapper;
 public class ESUtils {
 
     private static final RestHighLevelClient client = EsConfig.newClientInstance(true);
-    private static final ConcurrentHashMap<String, EsContract> cache = new ConcurrentHashMap(6000000);
-
     public static boolean documentExists(String index, String field, String value) {
         CountRequest request = new CountRequest(index);
         QueryBuilder qb = QueryBuilders.matchQuery(field, value);
@@ -89,125 +84,6 @@ public class ESUtils {
         }
     }
 
-    public static EsContract getContractByAddress(String tokenAddress) {
-        EsContract esContract = cache.get(tokenAddress);
-        if (esContract != null) {
-            return esContract;
-        }
-
-        SearchRequest request = new SearchRequest("erc_contract");
-        SearchSourceBuilder builder = new SearchSourceBuilder();
-
-        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("address", tokenAddress);
-        builder.query(queryBuilder);
-        request.source(builder);
-        try {
-            SearchResponse response = client.search(request, RequestOptions.DEFAULT);
-            SearchHits hits = response.getHits();
-            if (hits.getHits().length != 1) {
-                return null;
-            }
-            SearchHit at = hits.getAt(0);
-            esContract = objectMapper.readValue(at.getSourceAsString(), EsContract.class);
-            cache.put(tokenAddress, esContract);
-            return esContract;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static List<EsContract> getContractByAddresses(Set<String> contractAddresses) {
-        List<EsContract> ans = new ArrayList<>(contractAddresses.size());
-        for (String contractAddress : contractAddresses) {
-            EsContract esContract = cache.get(contractAddress);
-            if (esContract != null) {
-                ans.add(esContract);
-            }
-        }
-        if (ans.size() == contractAddresses.size()) {
-            return ans;
-        }
-
-        SearchRequest request = new SearchRequest("erc_contract");
-        SearchSourceBuilder builder = new SearchSourceBuilder();
-
-        IdsQueryBuilder queryBuilder = QueryBuilders.idsQuery();
-        queryBuilder.addIds(contractAddresses.toArray(new String[contractAddresses.size()]));
-        builder.size(contractAddresses.size());
-        builder.query(queryBuilder);
-        request.source(builder);
-        try {
-            SearchResponse response = client.search(request, RequestOptions.DEFAULT);
-            SearchHits hits = response.getHits();
-            for (SearchHit hit : hits) {
-                ans.add(objectMapper.readValue(hit.getSourceAsString(), EsContract.class));
-            }
-
-            for (EsContract an : ans) {
-                cache.put(an.getAddress(), an);
-            }
-            return ans;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public static void saveContractBatch(List<EsContract> saveList) {
-        BulkRequest request = new BulkRequest();
-        for (EsContract object : saveList) {
-            try {
-                IndexRequest indexRequest = new IndexRequest("erc_contract");
-                indexRequest.id(object.getAddress());
-                indexRequest.source(objectMapper.writeValueAsString(object), XContentType.JSON);
-                request.add(indexRequest);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-         /*
-         设置刷新策略
-        */
-        //request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
-        try {
-            client.bulk(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void saveBalanceBatch(List<EsBalance> esBalances) {
-        BulkRequest request = new BulkRequest();
-        for (EsBalance object : esBalances) {
-            try {
-                IndexRequest indexRequest = new IndexRequest("erc20_balance");
-                indexRequest.id(object.getAddress() + object.getContract());
-                indexRequest.source(objectMapper.writeValueAsString(object), XContentType.JSON);
-                request.add(indexRequest);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-         /*
-         设置刷新策略
-        */
-        //request.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
-        try {
-            client.bulk(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void putCache(Set<String> contractAddresses) {
-        EsContract esContract;
-        for (String contractAddress : contractAddresses) {
-            esContract = new EsContract();
-            esContract.setAddress(contractAddress);
-            esContract.setStandard(Collections.singletonList("unknown"));
-            cache.put(contractAddress, esContract);
-        }
-    }
 
     public static void saveNFTBalanceBatch(List<NFTBalance> nftBalances, long blockNumber) {
         BulkRequest request = new BulkRequest();

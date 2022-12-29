@@ -3,16 +3,13 @@ package io.debc.nft.contract;
 import com.esaulpaugh.headlong.abi.Address;
 import com.esaulpaugh.headlong.util.FastHex;
 import io.debc.nft.annotation.Contract;
-import io.debc.nft.entity.EsContract;
 import lombok.extern.slf4j.Slf4j;
-import org.web3j.crypto.Hash;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthCall;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @description:
@@ -35,14 +32,6 @@ public class Erc721Contract extends NftContract {
         return interfaceId;
     }
 
-    @Override
-    public EsContract callContractMethods(String contractAddress) {
-        EsContract esContract = super.callContractMethods(contractAddress);
-        if (esContract != null) {
-            esContract.setStd("721");
-        }
-        return esContract;
-    }
 
     public String ownerOf(String contractAddress, String tokenId) throws Exception {
         byte[] bytes = ownerOfFunc.encodeCallWithArgs(new BigInteger(tokenId, 16)).array();
