@@ -62,7 +62,7 @@ public class TransferBatchEventHandler implements EventHandler {
         return ans;
     }
 
-    public List<NFTBalance> addNFTBalance(List<NFTBalance> ans, String userId, String contractAddress, String tokenId) {
+    public void addNFTBalance(List<NFTBalance> ans, String userId, String contractAddress, String tokenId) {
         NFTBalance nftBalance;
         BigInteger balance;
         try {
@@ -79,7 +79,6 @@ public class TransferBatchEventHandler implements EventHandler {
             nftBalance.setStd(1);
             ans.add(nftBalance);
         }
-        return ans;
     }
 
     @Override

@@ -28,6 +28,7 @@ import static io.debc.nft.config.ConfigurableConstants.*;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
+        // es min  5804610
         // 2022-12-29 14:14:57 [INFO ] [pool-produce-thread-2] i.d.n.t.TConsumer - handle 937821 time :15
 
         Set<EventHandler> eventHandlers = SysUtils.componentScan("io.debc.nft.handler", Event.class);
@@ -36,7 +37,7 @@ public class Main {
         Pool pool = new Pool(PRODUCE_CORE_SIZE, PRODUCE_QUEUE_SIZE, "produce");
         long lastExecNumber = Long.parseLong(SysUtils.getSystemEnv("LAST_EXEC_BLOCK", "" + Math.max(ESUtils.getMaxBlock() - REPEAT, 0)));
         log.info("get lastExec block :{}", lastExecNumber);
-        //pool.execute(new TConsumer(producer, 13078838, eventHandlers));
+        //pool.execute(new TConsumer(producer, 6503749, eventHandlers));
         while (true) {
             EventHandler.nftHasHandleCache.cleanUp();
             EventHandler.contract721Cache.cleanUp();
