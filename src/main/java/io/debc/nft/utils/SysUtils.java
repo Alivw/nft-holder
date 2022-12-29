@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.reflections.Reflections;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -61,6 +62,12 @@ public class SysUtils {
         TupleType tupleType = TupleType.parse("(uint256,uint256)");
         Tuple decode = tupleType.decode(FastHex.decode(data));
         return decode.get(0).toString();
+    }
+
+    public static BigInteger[] decodeTransferBatchData(String data) {
+        TupleType tupleType = TupleType.parse("(uint256[],uint256[])");
+        Tuple decode = tupleType.decode(FastHex.decode(data));
+        return decode.get(0);
     }
 
 
