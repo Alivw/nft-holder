@@ -41,6 +41,7 @@ import static io.debc.nft.utils.SysUtils.objectMapper;
 public class ESUtils {
 
     private static final RestHighLevelClient client = EsConfig.newClientInstance(true);
+
     public static boolean documentExists(String index, String field, String value) {
         CountRequest request = new CountRequest(index);
         QueryBuilder qb = QueryBuilders.matchQuery(field, value);
@@ -92,6 +93,8 @@ public class ESUtils {
                 IndexRequest indexRequest = new IndexRequest("nft_balance");
                 //String tokenId = balance.getTokenId();
                 //balance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
+                balance.setAddress(balance.getAddress().toLowerCase());
+                balance.setContract(balance.getContract().toLowerCase());
                 if (balance.getStd() == 0) {
                     indexRequest.id(balance.getContract() + balance.getTokenId());
                 } else {
