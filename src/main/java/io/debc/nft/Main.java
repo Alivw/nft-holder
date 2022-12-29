@@ -34,12 +34,12 @@ public class Main {
 
         Producer producer = getProducer();
         Pool pool = new Pool(PRODUCE_CORE_SIZE, PRODUCE_QUEUE_SIZE, "produce");
-        long lastExecNumber = Math.max(ESUtils.getMaxBlock() - REPEAT, 0);
+        long lastExecNumber = Long.parseLong(SysUtils.getSystemEnv("LAST_EXEC_BLOCK", "" + Math.max(ESUtils.getMaxBlock() - REPEAT, 0)));
         log.info("get lastExec block :{}", lastExecNumber);
         //pool.execute(new TConsumer(producer, 13079362, eventHandlers));
         while (true) {
             EventHandler.nftHasHandleCache.cleanUp();
-            EventHandler.contractCache.cleanUp();
+            EventHandler.contract721Cache.cleanUp();
             log.info("start time : {}", System.currentTimeMillis());
             long ethBlockNumber = Web3Utils.getEthBlockNumber();
             if (lastExecNumber < ethBlockNumber) {

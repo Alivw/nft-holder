@@ -60,6 +60,6 @@ public class SysUtils {
     public static String decodeTransferSingleData(String data) {
         TupleType tupleType = TupleType.parse("(uint256,uint256)");
         Tuple decode = tupleType.decode(FastHex.decode(data));
-        return decode.get(0);
+        return decode.get(0).toString();
     }
 }

@@ -28,7 +28,7 @@ public class TransferEventHandler implements EventHandler {
         Map<String, Set<String>> nft721Map = logs.stream().collect(Collectors.groupingBy(Log::getAddress, Collectors.mapping(e -> e.getTopics().get(3), Collectors.toSet())));
         for (Map.Entry<String, Set<String>> entry : nft721Map.entrySet()) {
             String contractAddress = entry.getKey();
-            Integer is721 = contractCache.get(contractAddress);
+            Integer is721 = contract721Cache.get(contractAddress);
             if (is721 == 1) {
                 for (String tokenId : entry.getValue()) {
                     Boolean nftHasHandled = nftHasHandleCache.getIfPresent(contractAddress + tokenId);
