@@ -58,6 +58,7 @@ public class TConsumer extends Thread {
             }
             if (!nftBalances.isEmpty()) {
                 ESUtils.saveNFTBalanceBatch(nftBalances,blockNumber);
+                log.info("write block info into es {}",blockNumber);
             }
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
