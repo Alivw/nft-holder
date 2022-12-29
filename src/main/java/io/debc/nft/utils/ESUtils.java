@@ -5,7 +5,6 @@ import io.debc.nft.config.EsConfig;
 import io.debc.nft.entity.EsBalance;
 import io.debc.nft.entity.EsContract;
 import io.debc.nft.entity.NFTBalance;
-import org.apache.commons.codec.digest.Md5Crypt;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -28,7 +27,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +58,7 @@ public class ESUtils {
     }
 
     public static long getMaxBlock() {
-        SearchRequest searchRequest = new SearchRequest("nft_balance_log");
+        SearchRequest searchRequest = new SearchRequest("nft_balance");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         StatsAggregationBuilder statsAggregationBuilder = AggregationBuilders.stats("blockNumber").field("blockNumber");
         searchSourceBuilder.aggregation(statsAggregationBuilder);
@@ -211,7 +209,7 @@ public class ESUtils {
         }
     }
 
-    public static void saveNFTBalanceBatch(List<NFTBalance> nftBalances) {
+    public static void saveNFTBalanceBatch(List<NFTBalance> nftBalances, long blockNumber) {
         BulkRequest request = new BulkRequest();
         for (NFTBalance balance : nftBalances) {
             try {
@@ -224,6 +222,7 @@ public class ESUtils {
                     indexRequest.id(balance.getAddress() + balance.getContract() + balance.getTokenId());
                 }
                 balance.setStd(null);
+                balance.setBlockNumber(blockNumber);
                 indexRequest.source(objectMapper.writeValueAsString(balance), XContentType.JSON);
                 request.add(indexRequest);
             } catch (JsonProcessingException e) {
