@@ -44,8 +44,9 @@ public class TransferSingleEventHandler implements EventHandler {
             Integer is1155 = contract1155Cache.get(contractAddress);
             if (is1155 == 1) {
                 for (String userId : entry.getValue()) {
+                    userId = SysUtils.convertTooLongAddress(userId);
                     Boolean nftHasHandled = nftHasHandleCache.getIfPresent(userId + contractAddress + keys[1]);
-                    if (nftHasHandled == null) {
+                    if (nftHasHandled == null && !ETH_NULL_ADDRESS.equals(userId)) {
                         addNFTBalance(ans, userId, contractAddress, keys[1]);
                         nftHasHandleCache.put(userId + entry.getKey(), true);
                     }

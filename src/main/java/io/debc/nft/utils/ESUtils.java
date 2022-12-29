@@ -214,8 +214,8 @@ public class ESUtils {
         for (NFTBalance balance : nftBalances) {
             try {
                 IndexRequest indexRequest = new IndexRequest("nft_balance");
-                String tokenId = balance.getTokenId();
-                balance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
+                //String tokenId = balance.getTokenId();
+                //balance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
                 if (balance.getStd() == 0) {
                     indexRequest.id(balance.getContract() + balance.getTokenId());
                 } else {

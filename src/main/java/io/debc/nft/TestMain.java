@@ -21,7 +21,8 @@ public class TestMain {
 
         //System.out.println(new Erc20Contract().name("0xbb9bc244d798123fde783fcc1c72d3bb8c189413"));
         Erc1155Contract contract = new Erc1155Contract();
-        System.out.println(contract.balanceOf("0x463def03f98b328a75051ee5ebe9a6235de4ac59", "0xd07dc4262BCDbf85190C01c996b4C06a461d2430", BigInteger.valueOf(29377)));
+        System.out.println(new BigInteger("11").toString(16));
+        System.out.println(contract.supportInterface("0xfbd41e0c4517a684c121aa7dda2fc462d9592e63"));
         System.out.println();
     }
 

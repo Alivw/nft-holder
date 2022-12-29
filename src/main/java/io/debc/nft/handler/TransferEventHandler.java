@@ -3,8 +3,10 @@ package io.debc.nft.handler;
 import io.debc.nft.annotation.Event;
 import io.debc.nft.contract.Erc721Contract;
 import io.debc.nft.entity.NFTBalance;
+import org.joda.time.base.BaseInterval;
 import org.web3j.protocol.core.methods.response.Log;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ public class TransferEventHandler implements EventHandler {
             nftBalance = new NFTBalance();
             nftBalance.setAddress(userAddress);
             nftBalance.setAmount("1");
-            nftBalance.setTokenId(tokenId);
+            nftBalance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
             nftBalance.setContract(contractAddress);
             nftBalance.setStd(0);
             ans.add(nftBalance);
