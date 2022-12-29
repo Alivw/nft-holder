@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  **/
 @Event
 @Slf4j
-public class TransferBatchEventHandler implements EventHandler {
+public class TransferBatchEventHandler extends Abstract1155TransferEventHandler {
 
     private Erc1155Contract erc1155Contract = new Erc1155Contract();
     public static final String ID = "0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb";
@@ -38,47 +38,7 @@ public class TransferBatchEventHandler implements EventHandler {
             }
             return ans.stream();
         }).collect(Collectors.toList());
-        List<NFTBalance> ans = new ArrayList<>(logList.size());
-        Map<String, Set<String>> nft1155Map = logList.stream().collect(Collectors.groupingBy(t -> t.getAddress() + "-" + t.getData(), Collectors.mapping(e -> e.getTopics().get(2) + "-" + e.getTopics().get(3), Collectors.toSet())));
-        for (Map.Entry<String, Set<String>> entry : nft1155Map.entrySet()) {
-            String[] keys = entry.getKey().split("-");
-            String contractAddress = SysUtils.convertTooLongAddress(keys[0]);
-            Integer is1155 = contract1155Cache.get(contractAddress);
-            if (is1155 == 1) {
-                for (String fromAndToAddress : entry.getValue()) {
-                    String[] userAddress = fromAndToAddress.split("-");
-                    for (String address : userAddress) {
-                        address = SysUtils.convertTooLongAddress(address);
-                        Boolean nftHasHandled = nftHasHandleCache.getIfPresent(address + contractAddress + keys[1]);
-                        if (nftHasHandled == null && !ETH_NULL_ADDRESS.equals(address)) {
-                            addNFTBalance(ans, address, contractAddress, keys[1]);
-                            nftHasHandleCache.put(address + entry.getKey(), true);
-                        }
-                    }
-
-                }
-            }
-        }
-        return ans;
-    }
-
-    public void addNFTBalance(List<NFTBalance> ans, String userId, String contractAddress, String tokenId) {
-        NFTBalance nftBalance;
-        BigInteger balance;
-        try {
-            balance = erc1155Contract.balanceOf(userId, contractAddress, new BigInteger(tokenId));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        if (balance != null) {
-            nftBalance = new NFTBalance();
-            nftBalance.setAddress(userId);
-            nftBalance.setAmount(balance.toString());
-            nftBalance.setTokenId(tokenId);
-            nftBalance.setContract(contractAddress);
-            nftBalance.setStd(1);
-            ans.add(nftBalance);
-        }
+        return super.handle(logList);
     }
 
     @Override

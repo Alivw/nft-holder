@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  **/
 @Event
 @Slf4j
-public class TransferSingleEventHandler implements EventHandler {
+public class TransferSingleEventHandler extends Abstract1155TransferEventHandler {
     public static final String ID = "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62";
 
     @Override
@@ -35,51 +35,6 @@ public class TransferSingleEventHandler implements EventHandler {
     @Override
     public List<NFTBalance> handle(List<Log> logs) {
         logs = logs.stream().peek(t -> t.setData(SysUtils.decodeTransferSingleData(t.getData().substring(2)))).collect(Collectors.toList());
-        List<NFTBalance> ans = new ArrayList<>(logs.size());
-        Map<String, Set<String>> nft1155Map = logs.stream().collect(Collectors.groupingBy(t -> t.getAddress() + "-" + t.getData(), Collectors.mapping(e -> e.getTopics().get(2) + "-" + e.getTopics().get(3), Collectors.toSet())));
-        for (Map.Entry<String, Set<String>> entry : nft1155Map.entrySet()) {
-            String[] keys = entry.getKey().split("-");
-            String contractAddress = SysUtils.convertTooLongAddress(keys[0]);
-            Integer is1155 = contract1155Cache.get(contractAddress);
-            if (is1155 == 1) {
-                for (String fromAndToAddress : entry.getValue()) {
-                    for (String userId : fromAndToAddress.split("-")) {
-                        userId = SysUtils.convertTooLongAddress(userId);
-                        Boolean nftHasHandled = nftHasHandleCache.getIfPresent(userId + contractAddress + keys[1]);
-                        if (nftHasHandled == null && !ETH_NULL_ADDRESS.equals(userId)) {
-                            addNFTBalance(ans, userId, contractAddress, keys[1]);
-                            nftHasHandleCache.put(userId + entry.getKey(), true);
-                        }
-                    }
-                }
-            }
-        }
-        return ans;
-    }
-
-    /**
-     * @param ans
-     * @param userId
-     * @param contractAddress
-     * @param tokenId         BigInteger.toString()
-     */
-    private List<NFTBalance> addNFTBalance(List<NFTBalance> ans, String userId, String contractAddress, String tokenId) {
-        NFTBalance nftBalance;
-        BigInteger balance;
-        try {
-            balance = erc1155Contract.balanceOf(userId, contractAddress, new BigInteger(tokenId));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        if (balance != null) {
-            nftBalance = new NFTBalance();
-            nftBalance.setAddress(userId);
-            nftBalance.setAmount(balance.toString());
-            nftBalance.setTokenId(tokenId);
-            nftBalance.setContract(contractAddress);
-            nftBalance.setStd(1);
-            ans.add(nftBalance);
-        }
-        return ans;
+        return super.handle(logs);
     }
 }

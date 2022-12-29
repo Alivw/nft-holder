@@ -100,7 +100,6 @@ public class ESUtils {
                 } else {
                     indexRequest.id(balance.getAddress() + balance.getContract() + balance.getTokenId());
                 }
-                balance.setStd(null);
                 balance.setBlockNumber(blockNumber);
                 indexRequest.source(objectMapper.writeValueAsString(balance), XContentType.JSON);
                 request.add(indexRequest);
