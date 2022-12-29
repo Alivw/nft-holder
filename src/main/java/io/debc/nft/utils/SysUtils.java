@@ -62,4 +62,9 @@ public class SysUtils {
         Tuple decode = tupleType.decode(FastHex.decode(data));
         return decode.get(0).toString();
     }
+
+
+    public static String convertTooLongAddress(String address) {
+        return address.length() == 66 ? "0x" + address.substring(26) : address;
+    }
 }

@@ -18,8 +18,8 @@ import java.util.Set;
  **/
 public interface EventHandler {
 
-    LoadingCache<String, Integer> contract721Cache = CacheConfig.getContractCache();
-    LoadingCache<String, Integer> contract1155Cache = CacheConfig.getContractCache();
+    LoadingCache<String, Integer> contract721Cache = CacheConfig.get721ContractCache();
+    LoadingCache<String, Integer> contract1155Cache = CacheConfig.get721ContractCache();
 
     Cache<String, Boolean> nftHasHandleCache = CacheConfig.nftHasHandledCache();
     /**

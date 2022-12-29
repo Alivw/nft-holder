@@ -4,6 +4,7 @@ import io.debc.nft.annotation.Event;
 import io.debc.nft.contract.Erc1155Contract;
 import io.debc.nft.entity.NFTBalance;
 import io.debc.nft.utils.SysUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.Log;
 
 import java.math.BigInteger;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * @create: 2022-12-28 11:07
  **/
 @Event
+@Slf4j
 public class TransferSingleEventHandler implements EventHandler {
     public static final String ID = "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62";
 
@@ -32,25 +34,25 @@ public class TransferSingleEventHandler implements EventHandler {
 
     @Override
     public List<NFTBalance> handle(List<Log> logs) {
+        log.info("transfer single handle ....");
         logs = logs.stream().peek(t -> t.setData(SysUtils.decodeTransferSingleData(t.getData().substring(2)))).collect(Collectors.toList());
         List<NFTBalance> ans = new ArrayList<>(logs.size());
         Map<String, Set<String>> nft1155Map = logs.stream().collect(Collectors.groupingBy(t -> t.getAddress() + "-" + t.getData(), Collectors.mapping(e -> e.getTopics().get(2), Collectors.toSet())));
         for (Map.Entry<String, Set<String>> entry : nft1155Map.entrySet()) {
             String[] keys = entry.getKey().split("-");
-            String contractAddress = keys[0];
+            String contractAddress = SysUtils.convertTooLongAddress(keys[0]);
             Integer is1155 = contract1155Cache.get(contractAddress);
             if (is1155 == 1) {
                 for (String userId : entry.getValue()) {
-                    Boolean nftHasHandled = nftHasHandleCache.getIfPresent(userId + entry.getKey());
+                    Boolean nftHasHandled = nftHasHandleCache.getIfPresent(userId + contractAddress + keys[1]);
                     if (nftHasHandled == null) {
-                        //
                         addNFTBalance(ans, userId, contractAddress, keys[1]);
                         nftHasHandleCache.put(userId + entry.getKey(), true);
                     }
                 }
             }
         }
-
+        log.info("transfer single handle successfully {}", ans.size());
         return ans;
     }
 

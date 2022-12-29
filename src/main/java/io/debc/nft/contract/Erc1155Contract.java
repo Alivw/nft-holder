@@ -1,5 +1,6 @@
 package io.debc.nft.contract;
 
+import com.esaulpaugh.headlong.abi.Address;
 import com.esaulpaugh.headlong.util.FastHex;
 import io.debc.nft.annotation.Contract;
 import io.debc.nft.entity.EsContract;
@@ -43,7 +44,7 @@ public class Erc1155Contract extends NftContract {
 
 
     public BigInteger balanceOf(String userId, String contractAddress, BigInteger tokenId) throws IOException {
-        byte[] bytes = balanceOfFunc.encodeCallWithArgs(userId, tokenId).array();
+        byte[] bytes = balanceOfFunc.encodeCallWithArgs(Address.wrap(Address.toChecksumAddress(userId)), tokenId).array();
         String data = FastHex.encodeToString(bytes);
         Transaction transaction = Transaction.createEthCallTransaction(null, contractAddress, data);
         Request<?, EthCall> request = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST);

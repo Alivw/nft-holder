@@ -36,20 +36,20 @@ public class Main {
         Pool pool = new Pool(PRODUCE_CORE_SIZE, PRODUCE_QUEUE_SIZE, "produce");
         long lastExecNumber = Long.parseLong(SysUtils.getSystemEnv("LAST_EXEC_BLOCK", "" + Math.max(ESUtils.getMaxBlock() - REPEAT, 0)));
         log.info("get lastExec block :{}", lastExecNumber);
-        //pool.execute(new TConsumer(producer, 13079362, eventHandlers));
-        while (true) {
-            EventHandler.nftHasHandleCache.cleanUp();
-            EventHandler.contract721Cache.cleanUp();
-            log.info("start time : {}", System.currentTimeMillis());
-            long ethBlockNumber = Web3Utils.getEthBlockNumber();
-            if (lastExecNumber < ethBlockNumber) {
-                for (long i = lastExecNumber + 1; i <= ethBlockNumber; i++) {
-                    pool.execute(new TConsumer(producer, i, eventHandlers));
-                }
-            }
-            lastExecNumber = ethBlockNumber;
-            TimeUnit.SECONDS.sleep(MAIN_SLEEP_SECONDS);
-        }
+        pool.execute(new TConsumer(producer, 16286989, eventHandlers));
+        //while (true) {
+        //    EventHandler.nftHasHandleCache.cleanUp();
+        //    EventHandler.contract721Cache.cleanUp();
+        //    log.info("start time : {}", System.currentTimeMillis());
+        //    long ethBlockNumber = Web3Utils.getEthBlockNumber();
+        //    if (lastExecNumber < ethBlockNumber) {
+        //        for (long i = lastExecNumber + 1; i <= ethBlockNumber; i++) {
+        //            pool.execute(new TConsumer(producer, i, eventHandlers));
+        //        }
+        //    }
+        //    lastExecNumber = ethBlockNumber;
+        //    TimeUnit.SECONDS.sleep(MAIN_SLEEP_SECONDS);
+        //}
     }
 
     private static Producer getProducer() {
