@@ -34,7 +34,6 @@ public class TransferSingleEventHandler implements EventHandler {
 
     @Override
     public List<NFTBalance> handle(List<Log> logs) {
-        log.info("transfer single handle ....");
         logs = logs.stream().peek(t -> t.setData(SysUtils.decodeTransferSingleData(t.getData().substring(2)))).collect(Collectors.toList());
         List<NFTBalance> ans = new ArrayList<>(logs.size());
         Map<String, Set<String>> nft1155Map = logs.stream().collect(Collectors.groupingBy(t -> t.getAddress() + "-" + t.getData(), Collectors.mapping(e -> e.getTopics().get(2) + "-" + e.getTopics().get(3), Collectors.toSet())));
@@ -55,7 +54,6 @@ public class TransferSingleEventHandler implements EventHandler {
                 }
             }
         }
-        log.info("transfer single handle successfully {}", ans.size());
         return ans;
     }
 

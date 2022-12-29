@@ -59,7 +59,6 @@ public class TransferBatchEventHandler implements EventHandler {
                 }
             }
         }
-        log.info("transfer single handle successfully {}", ans.size());
         return ans;
     }
 
