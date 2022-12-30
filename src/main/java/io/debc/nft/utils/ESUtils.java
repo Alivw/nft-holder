@@ -96,9 +96,9 @@ public class ESUtils {
                 balance.setAddress(balance.getAddress().toLowerCase());
                 balance.setContract(balance.getContract().toLowerCase());
                 if (balance.getStd() == 0) {
-                    indexRequest.id(balance.getContract() + balance.getTokenId());
+                    indexRequest.id(MD5Utils.encrypt(balance.getContract() + balance.getTokenId()));
                 } else {
-                    indexRequest.id(balance.getAddress() + balance.getContract() + balance.getTokenId());
+                    indexRequest.id(MD5Utils.encrypt(balance.getAddress() + balance.getContract() + balance.getTokenId()));
                 }
                 balance.setBlockNumber(blockNumber);
                 indexRequest.source(objectMapper.writeValueAsString(balance), XContentType.JSON);

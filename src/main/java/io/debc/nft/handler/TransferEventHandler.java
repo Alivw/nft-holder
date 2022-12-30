@@ -3,6 +3,7 @@ package io.debc.nft.handler;
 import io.debc.nft.annotation.Event;
 import io.debc.nft.contract.Erc721Contract;
 import io.debc.nft.entity.NFTBalance;
+import io.debc.nft.utils.MD5Utils;
 import org.web3j.protocol.core.methods.response.Log;
 
 import java.math.BigInteger;
@@ -57,10 +58,11 @@ public class TransferEventHandler implements EventHandler {
             Integer is721 = contract721Cache.get(contractAddress);
             if (is721 == 1) {
                 for (String tokenId : entry.getValue()) {
-                    Boolean nftHasHandled = nftHasHandleCache.getIfPresent(contractAddress + tokenId);
+                    String cacheKey = MD5Utils.encrypt(contractAddress + tokenId);
+                    Boolean nftHasHandled = nftHasHandleCache.getIfPresent(cacheKey);
                     if (nftHasHandled == null) {
                         addNFTBalance(ans, contractAddress, tokenId);
-                        nftHasHandleCache.put(contractAddress + tokenId, true);
+                        nftHasHandleCache.put(cacheKey, true);
                     }
                 }
             }

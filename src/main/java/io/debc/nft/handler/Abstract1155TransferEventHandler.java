@@ -2,6 +2,7 @@ package io.debc.nft.handler;
 
 import io.debc.nft.contract.Erc1155Contract;
 import io.debc.nft.entity.NFTBalance;
+import io.debc.nft.utils.MD5Utils;
 import io.debc.nft.utils.SysUtils;
 import org.web3j.protocol.core.methods.response.Log;
 
@@ -32,10 +33,11 @@ public abstract class Abstract1155TransferEventHandler implements EventHandler {
                 for (String fromAndToAddress : entry.getValue()) {
                     for (String userId : fromAndToAddress.split("-")) {
                         userId = SysUtils.convertTooLongAddress(userId);
-                        Boolean nftHasHandled = nftHasHandleCache.getIfPresent(userId + contractAddress + keys[1]);
+                        String cacheKey = MD5Utils.encrypt(userId + contractAddress + keys[1]);
+                        Boolean nftHasHandled = nftHasHandleCache.getIfPresent(cacheKey);
                         if (nftHasHandled == null && !ETH_NULL_ADDRESS.equals(userId)) {
                             addNFTBalance(ans, userId, contractAddress, keys[1]);
-                            nftHasHandleCache.put(userId + entry.getKey(), true);
+                            nftHasHandleCache.put(cacheKey, true);
                         }
                     }
                 }
