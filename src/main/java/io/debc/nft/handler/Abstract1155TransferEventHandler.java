@@ -5,6 +5,7 @@ import io.debc.nft.entity.NFTBalance;
 import io.debc.nft.utils.MD5Utils;
 import io.debc.nft.utils.SysUtils;
 import org.web3j.protocol.core.methods.response.Log;
+import org.yaml.snakeyaml.events.Event;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -31,13 +32,14 @@ public abstract class Abstract1155TransferEventHandler implements EventHandler {
             Integer is1155 = contract1155Cache.get(contractAddress);
             if (is1155 == 1) {
                 for (String fromAndToAddress : entry.getValue()) {
-                    for (String userId : fromAndToAddress.split("-")) {
-                        userId = SysUtils.convertTooLongAddress(userId);
+                    for (String longUserId : fromAndToAddress.split("-")) {
+                        String userId = SysUtils.convertTooLongAddress(longUserId);
                         String cacheKey = MD5Utils.encrypt(userId + contractAddress + keys[1]);
-                        Boolean nftHasHandled = nftHasHandleCache.getIfPresent(cacheKey);
-                        if (nftHasHandled == null && !ETH_NULL_ADDRESS.equals(userId)) {
-                            addNFTBalance(ans, userId, contractAddress, keys[1]);
-                            nftHasHandleCache.put(cacheKey, true);
+                        if (!ETH_NULL_ADDRESS.equals(userId)) {
+                            nftHasHandleCache.get(cacheKey, key -> {
+                                addNFTBalance(ans, userId, contractAddress, keys[1]);
+                                return true;
+                            });
                         }
                     }
                 }

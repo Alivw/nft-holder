@@ -17,6 +17,7 @@ public class CacheConfig {
     private static Erc721Contract erc721Contract = new Erc721Contract();
 
     private static Erc1155Contract erc1155Contract = new Erc1155Contract();
+
     public static LoadingCache<String, Integer> get721ContractCache() {
         return Caffeine.newBuilder().maximumSize(500_000L)
                 .initialCapacity(1024)
