@@ -4,7 +4,6 @@ import io.debc.nft.annotation.Event;
 import io.debc.nft.contract.Erc721Contract;
 import io.debc.nft.entity.NFTBalance;
 import io.debc.nft.utils.MD5Utils;
-import kotlin.jvm.Synchronized;
 import org.web3j.protocol.core.methods.response.Log;
 
 import java.math.BigInteger;

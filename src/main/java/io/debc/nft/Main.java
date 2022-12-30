@@ -41,7 +41,6 @@ public class Main {
         while (true) {
             EventHandler.nftHasHandleCache.cleanUp();
             EventHandler.contract721Cache.cleanUp();
-            log.info("start time : {}", System.currentTimeMillis());
             long ethBlockNumber = Web3Utils.getEthBlockNumber();
             if (lastExecNumber < ethBlockNumber) {
                 for (long i = lastExecNumber + 1; i <= ethBlockNumber; i++) {
