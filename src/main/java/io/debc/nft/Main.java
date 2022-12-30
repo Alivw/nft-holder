@@ -37,7 +37,7 @@ public class Main {
         Pool pool = new Pool(PRODUCE_CORE_SIZE, PRODUCE_QUEUE_SIZE, "produce");
         long lastExecNumber = Long.parseLong(SysUtils.getSystemEnv("LAST_EXEC_BLOCK", "" + Math.max(ESUtils.getMaxBlock() - REPEAT, 0)));
         log.info("get lastExec block :{}", lastExecNumber);
-        //pool.execute(new TConsumer(producer, 5804610, eventHandlers));
+        //pool.execute(new TConsumer(producer, 14788382, eventHandlers));
         while (true) {
             EventHandler.nftHasHandleCache.cleanUp();
             EventHandler.contract721Cache.cleanUp();

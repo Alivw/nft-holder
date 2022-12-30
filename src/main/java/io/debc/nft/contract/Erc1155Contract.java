@@ -38,6 +38,9 @@ public class Erc1155Contract extends NftContract {
         Transaction transaction = Transaction.createEthCallTransaction(null, contractAddress, data);
         Request<?, EthCall> request = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST);
         EthCall ethCall = request.send();
+        if (ethCall.getResult() == null) {
+            return null;
+        }
         return balanceOfFunc.decodeReturn(FastHex.decode(ethCall.getResult().substring(2))).get(0);
     }
 }
