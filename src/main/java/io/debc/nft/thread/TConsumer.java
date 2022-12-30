@@ -40,25 +40,27 @@ public class TConsumer extends Thread {
             long s = System.currentTimeMillis();
             Map<String, List<Log>> logMap = logs.stream().collect(Collectors.groupingBy(e -> e.getTopics().get(0), Collectors.mapping(Function.identity(), Collectors.toList())));
             List<NFTBalance> nftBalances = new ArrayList<>(logs.size());
-            for (Map.Entry<String, List<Log>> entry : logMap.entrySet()) {
-                for (EventHandler eventHandler : eventHandlers) {
-                    if (eventHandler.canHandle(entry.getKey())) {
-                        try {
+            try {
+                for (Map.Entry<String, List<Log>> entry : logMap.entrySet()) {
+                    for (EventHandler eventHandler : eventHandlers) {
+                        if (eventHandler.canHandle(entry.getKey())) {
+
                             List<NFTBalance> handleBalances = eventHandler.handle(entry.getValue());
                             if (!CollectionUtils.isEmpty(handleBalances)) {
                                 nftBalances.addAll(handleBalances);
                             }
-                        } catch (Exception e) {
-                            log.error("exec block error: {}", blockNumber, e);
-                            System.exit(500);
-                        }
 
+
+                        }
                     }
                 }
-            }
-            if (!nftBalances.isEmpty()) {
-                ESUtils.saveNFTBalanceBatch(nftBalances,blockNumber);
-                log.info("write block info into es {}",blockNumber);
+                if (!nftBalances.isEmpty()) {
+                    ESUtils.saveNFTBalanceBatch(nftBalances, blockNumber);
+                    log.info("write block info into es {}", blockNumber);
+                }
+            } catch (Exception e) {
+                log.error("exec block error: {}", blockNumber, e);
+                System.exit(500);
             }
             log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
         }
