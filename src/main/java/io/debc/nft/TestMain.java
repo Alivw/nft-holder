@@ -1,16 +1,12 @@
 package io.debc.nft;
 
-import com.esaulpaugh.headlong.abi.Tuple;
-import com.esaulpaugh.headlong.abi.TupleType;
-import com.esaulpaugh.headlong.util.FastHex;
-import io.debc.nft.contract.Erc1155Contract;
-import io.debc.nft.contract.Erc721Contract;
-import io.debc.nft.utils.SysUtils;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.elasticsearch.script.mustache.SearchTemplateAction;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 /**
  * @description:
@@ -18,22 +14,38 @@ import java.util.List;
  * @create: 2022-12-12 13:25
  **/
 public class TestMain {
+    static CacheLoader cacheLoader = new CacheLoader();
 
     public static void main(String[] args) throws Exception {
+        ExecutorService pool = Executors.newFixedThreadPool(10);
+
+        Cache<String, Integer> cache = Caffeine.newBuilder().build();
+        for (int i = 0; i < 20; i++) {
+            final String j =""+ i % 5;
+            pool.execute(()->{
+                String intern = j.intern();
+                synchronized (j) {
+                    Integer c = cache.getIfPresent(j);
+                    if (c == null) {
+                        System.out.println("not hit cache");
+                        cache.put("" + j, 4);
+                    }else {
+                        System.out.println(c);
+                    }
+                }
 
 
-        List<Integer> ans = new ArrayList<>();
-
-        add(ans);
-
-        System.out.println(ans.size());
-        System.out.println();
+            });
+        }
     }
 
-    private static void add(List<Integer> ans) {
-        ans.add(1);
-        ans.add(2);
-    }
 
+    static class CacheLoader implements Function<String, Integer> {
+        @Override
+        public Integer apply(String s) {
+            System.out.println("not hit cache");
+            return Integer.parseInt(s) * 2;
+        }
+    }
 
 }

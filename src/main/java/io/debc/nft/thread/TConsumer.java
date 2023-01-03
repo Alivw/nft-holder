@@ -5,10 +5,12 @@ import io.debc.nft.handler.EventHandler;
 import io.debc.nft.product.Producer;
 import io.debc.nft.utils.CollectionUtils;
 import io.debc.nft.utils.ESUtils;
+import io.debc.nft.utils.SysUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.Log;
 
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,7 @@ public class TConsumer extends Thread {
 
     private Set<EventHandler> eventHandlers;
 
+    public static final int retryTimes = Integer.parseInt(SysUtils.getSystemEnv("retry_times", "10"));
 
     public TConsumer(Producer producer, long blockNumber, Set<EventHandler> eventHandler) {
         this.eventHandlers = eventHandler;
@@ -37,33 +40,47 @@ public class TConsumer extends Thread {
     public void run() {
         List<Log> logs = producer.obtainTopics(blockNumber);
         if (!logs.isEmpty()) {
-            long s = System.currentTimeMillis();
-            Map<String, List<Log>> logMap = logs.stream().collect(Collectors.groupingBy(e -> e.getTopics().get(0), Collectors.mapping(Function.identity(), Collectors.toList())));
-            List<NFTBalance> nftBalances = new ArrayList<>(logs.size());
-            try {
-                for (Map.Entry<String, List<Log>> entry : logMap.entrySet()) {
-                    for (EventHandler eventHandler : eventHandlers) {
-                        if (eventHandler.canHandle(entry.getKey())) {
-
-                            List<NFTBalance> handleBalances = eventHandler.handle(entry.getValue());
-                            if (!CollectionUtils.isEmpty(handleBalances)) {
-                                nftBalances.addAll(handleBalances);
-                            }
-
-
-                        }
-                    }
-                }
-                if (!nftBalances.isEmpty()) {
-                    ESUtils.saveNFTBalanceBatch(nftBalances, blockNumber);
-                    log.info("write block info into es {}", blockNumber);
-                }
-            } catch (Exception e) {
-                log.error("exec block error: {}", blockNumber, e);
-                System.exit(500);
-            }
-            log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
+            doRun(logs, retryTimes);
         }
+    }
+
+    private void doRun(List<Log> logs, int retryTimes) {
+        if (retryTimes > 0) {
+            try {
+                doRun(logs);
+            } catch (Exception e) {
+                log.error("handle {} throws exception,retry times = {}", blockNumber, retryTimes, e);
+                doRun(logs, --retryTimes);
+            }
+        } else {
+            log.error("handle {} throws exception", blockNumber);
+            System.exit(500);
+        }
+
+    }
+
+    private void doRun(List<Log> logs) {
+        long s = System.currentTimeMillis();
+        Map<String, List<Log>> logMap = logs.stream().collect(Collectors.groupingBy(e -> e.getTopics().get(0), Collectors.mapping(Function.identity(), Collectors.toList())));
+        List<NFTBalance> nftBalances = new ArrayList<>(logs.size());
+        for (Map.Entry<String, List<Log>> entry : logMap.entrySet()) {
+            for (EventHandler eventHandler : eventHandlers) {
+                if (eventHandler.canHandle(entry.getKey())) {
+
+                    List<NFTBalance> handleBalances = eventHandler.handle(entry.getValue());
+                    if (!CollectionUtils.isEmpty(handleBalances)) {
+                        nftBalances.addAll(handleBalances);
+                    }
+
+
+                }
+            }
+        }
+        if (!nftBalances.isEmpty()) {
+            ESUtils.saveNFTBalanceBatch(nftBalances, blockNumber);
+            log.info("write block info into es {}", blockNumber);
+        }
+        log.info("handle {} time :{}", blockNumber, System.currentTimeMillis() - s);
     }
 
 }
