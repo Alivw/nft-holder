@@ -95,7 +95,7 @@ public class ESUtils {
                 //balance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
                 balance.setAddress(balance.getAddress().toLowerCase());
                 balance.setContract(balance.getContract().toLowerCase());
-                if (balance.getStd() == 0) {
+                if ("721".equals(balance.getStd())) {
                     indexRequest.id(MD5Utils.encrypt(balance.getContract() + balance.getTokenId()));
                 } else {
                     indexRequest.id(MD5Utils.encrypt(balance.getAddress() + balance.getContract() + balance.getTokenId()));

@@ -18,7 +18,7 @@ public class NFTBalance {
     private String address;
     private String amount;
     // 0:721 1:1155
-    private Integer std;
+    private String std;
 
     private Long blockNumber;
 }

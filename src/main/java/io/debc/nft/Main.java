@@ -28,7 +28,7 @@ import static io.debc.nft.config.ConfigurableConstants.*;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        // es min  5806610
+        // es min  5806610   RUN_ENV=http://192.168.31.55:8545;DATASOUCE=geth
         // 2022-12-29 14:14:57 [INFO ] [pool-produce-thread-2] i.d.n.t.TConsumer - handle 937821 time :15
 
         Set<EventHandler> eventHandlers = SysUtils.componentScan("io.debc.nft.handler", Event.class);

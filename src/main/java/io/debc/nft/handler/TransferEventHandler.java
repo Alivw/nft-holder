@@ -43,7 +43,7 @@ public class TransferEventHandler implements EventHandler {
             nftBalance.setAmount("1");
             nftBalance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
             nftBalance.setContract(contractAddress);
-            nftBalance.setStd(0);
+            nftBalance.setStd("721");
             ans.add(nftBalance);
         }
     }

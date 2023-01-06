@@ -68,7 +68,7 @@ public abstract class Abstract1155TransferEventHandler implements EventHandler {
             nftBalance.setAmount(balance.toString());
             nftBalance.setTokenId(tokenId);
             nftBalance.setContract(contractAddress);
-            nftBalance.setStd(1);
+            nftBalance.setStd("1155");
             ans.add(nftBalance);
         }
         return ans;
