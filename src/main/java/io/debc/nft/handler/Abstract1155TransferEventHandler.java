@@ -27,17 +27,20 @@ public abstract class Abstract1155TransferEventHandler implements EventHandler {
 
     @Override
     public List<NFTBalance> handle(List<Log> logs) {
-        List<NFTBalance> ans = new ArrayList<>(logs.size());
+        int size = logs.size();
+        List<NFTBalance> ans = new ArrayList<>(size + (size >> 1));
         Map<String, Set<String>> nft1155Map = logs.stream().collect(Collectors.groupingBy(t -> t.getAddress() + "-" + t.getData(), Collectors.mapping(e -> e.getTopics().get(2) + "-" + e.getTopics().get(3), Collectors.toSet())));
+        String cacheKey;
         for (Map.Entry<String, Set<String>> entry : nft1155Map.entrySet()) {
             String[] keys = entry.getKey().split("-");
             String contractAddress = SysUtils.convertTooLongAddress(keys[0]);
             Integer is1155 = contract1155Cache.get(contractAddress);
             if (is1155 == 1) {
                 for (String fromAndToAddress : entry.getValue()) {
+
                     for (String longUserId : fromAndToAddress.split("-")) {
                         String userId = SysUtils.convertTooLongAddress(longUserId);
-                        String cacheKey = MD5Utils.encrypt(userId + contractAddress + keys[1]);
+                        cacheKey = MD5Utils.encrypt(userId + contractAddress + keys[1]);
                         if (!ETH_NULL_ADDRESS.equals(userId)) {
                             nftHasHandleCache.get(cacheKey, key -> {
                                 addNFTBalance(ans, userId, contractAddress, keys[1], 10);

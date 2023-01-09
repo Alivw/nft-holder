@@ -62,7 +62,8 @@ public class TConsumer extends Thread {
     private void doRun(List<Log> logs) {
         long s = System.currentTimeMillis();
         Map<String, List<Log>> logMap = logs.stream().collect(Collectors.groupingBy(e -> e.getTopics().get(0), Collectors.mapping(Function.identity(), Collectors.toList())));
-        List<NFTBalance> nftBalances = new ArrayList<>(logs.size());
+        int size = logs.size();
+        List<NFTBalance> nftBalances = new ArrayList<>(size + (size >> 1));
         for (Map.Entry<String, List<Log>> entry : logMap.entrySet()) {
             for (EventHandler eventHandler : eventHandlers) {
                 if (eventHandler.canHandle(entry.getKey())) {
