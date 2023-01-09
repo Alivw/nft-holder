@@ -62,7 +62,7 @@ public abstract class Abstract1155TransferEventHandler implements EventHandler {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if (balance != null && BigInteger.ZERO.compareTo(balance) != 0) {
+        if (balance != null) {
             nftBalance = new NFTBalance();
             nftBalance.setAddress(userId);
             nftBalance.setAmount(balance.toString());
