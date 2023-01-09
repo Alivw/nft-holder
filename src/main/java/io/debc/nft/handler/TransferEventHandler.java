@@ -4,8 +4,11 @@ import io.debc.nft.annotation.Event;
 import io.debc.nft.contract.Erc721Contract;
 import io.debc.nft.entity.NFTBalance;
 import io.debc.nft.utils.MD5Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.Log;
 
+import javax.swing.*;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
  * @create: 2022-12-28 11:06
  **/
 @Event
+@Slf4j
 public class TransferEventHandler implements EventHandler {
     public static final String ID = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
@@ -29,23 +33,17 @@ public class TransferEventHandler implements EventHandler {
         return ID;
     }
 
-    private void addNFTBalance(List<NFTBalance> ans, String contractAddress, String tokenId) {
+    private void addNFTBalance(List<NFTBalance> ans, String contractAddress, String tokenId) throws IOException {
         NFTBalance nftBalance;
-        String userAddress = null;
-        try {
-            userAddress = erc721Contract.ownerOf(contractAddress, tokenId.substring(2));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        if (userAddress != null) {
-            nftBalance = new NFTBalance();
-            nftBalance.setAddress(userAddress);
-            nftBalance.setAmount("1");
-            nftBalance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
-            nftBalance.setContract(contractAddress);
-            nftBalance.setStd("721");
-            ans.add(nftBalance);
-        }
+        String userAddress = erc721Contract.ownerOf(contractAddress, tokenId.substring(2));
+
+        nftBalance = new NFTBalance();
+        nftBalance.setAddress(userAddress);
+        nftBalance.setAmount("1");
+        nftBalance.setTokenId(new BigInteger(tokenId.substring(2), 16).toString());
+        nftBalance.setContract(contractAddress);
+        nftBalance.setStd("721");
+        ans.add(nftBalance);
     }
 
 
@@ -60,12 +58,27 @@ public class TransferEventHandler implements EventHandler {
                 for (String tokenId : entry.getValue()) {
                     String cacheKey = MD5Utils.encrypt(contractAddress + tokenId);
                     nftHasHandleCache.get(cacheKey, key -> {
-                        addNFTBalance(ans, contractAddress, tokenId);
+                        addNFTBalance(ans, contractAddress, tokenId, 10);
                         return true;
                     });
                 }
             }
         }
         return ans;
+    }
+
+    private void addNFTBalance(List<NFTBalance> ans, String contractAddress, String tokenId, int retryTimes) {
+        if (retryTimes > 0) {
+            try {
+                addNFTBalance(ans, contractAddress, tokenId);
+            } catch (IOException e) {
+                addNFTBalance(ans, contractAddress, tokenId, --retryTimes);
+            } catch (RuntimeException e) {
+                // do nothing
+                log.debug("{}", e);
+            }
+        } else {
+            throw new RuntimeException("error");
+        }
     }
 }

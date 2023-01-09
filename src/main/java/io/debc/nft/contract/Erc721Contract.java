@@ -9,6 +9,8 @@ import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthCall;
 
+import javax.swing.*;
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -33,14 +35,14 @@ public class Erc721Contract extends NftContract {
     }
 
 
-    public String ownerOf(String contractAddress, String tokenId) throws Exception {
+    public String ownerOf(String contractAddress, String tokenId) throws IOException {
         byte[] bytes = ownerOfFunc.encodeCallWithArgs(new BigInteger(tokenId, 16)).array();
         String data = FastHex.encodeToString(bytes);
         Transaction transaction = Transaction.createEthCallTransaction(null, contractAddress, data);
         Request<?, EthCall> request = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST);
         EthCall ethCall = request.send();
         if (ethCall.getResult() == null) {
-            return null;
+            throw new RuntimeException(String.format("eth ownerOf contract call error . contractAddress=%s tokenId=%s", contractAddress, tokenId));
         }
         return ((Address) ownerOfFunc.decodeReturn(FastHex.decode(ethCall.getResult().substring(2))).get(0)).toString();
     }

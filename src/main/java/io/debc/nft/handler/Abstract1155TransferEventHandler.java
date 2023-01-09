@@ -4,9 +4,11 @@ import io.debc.nft.contract.Erc1155Contract;
 import io.debc.nft.entity.NFTBalance;
 import io.debc.nft.utils.MD5Utils;
 import io.debc.nft.utils.SysUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.web3j.protocol.core.methods.response.Log;
 import org.yaml.snakeyaml.events.Event;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
  * @author: Jalivv
  * @create: 2022-12-29 16:12
  **/
+@Slf4j
 public abstract class Abstract1155TransferEventHandler implements EventHandler {
     private Erc1155Contract erc1155Contract = new Erc1155Contract();
 
@@ -37,7 +40,7 @@ public abstract class Abstract1155TransferEventHandler implements EventHandler {
                         String cacheKey = MD5Utils.encrypt(userId + contractAddress + keys[1]);
                         if (!ETH_NULL_ADDRESS.equals(userId)) {
                             nftHasHandleCache.get(cacheKey, key -> {
-                                addNFTBalance(ans, userId, contractAddress, keys[1]);
+                                addNFTBalance(ans, userId, contractAddress, keys[1], 10);
                                 return true;
                             });
                         }
@@ -48,29 +51,36 @@ public abstract class Abstract1155TransferEventHandler implements EventHandler {
         return ans;
     }
 
+    private void addNFTBalance(List<NFTBalance> ans, String userId, String contractAddress, String key, int retryTimes) {
+        if (retryTimes > 0) {
+            try {
+                addNFTBalance(ans, userId, contractAddress, key);
+            } catch (IOException e) {
+                addNFTBalance(ans, userId, contractAddress, key, --retryTimes);
+            } catch (RuntimeException e) {
+                // do nothing
+                log.debug("{}", e);
+            }
+        } else {
+            throw new RuntimeException("error");
+        }
+    }
+
     /**
      * @param ans
      * @param userId
      * @param contractAddress
      * @param tokenId         BigInteger.toString()
      */
-    private List<NFTBalance> addNFTBalance(List<NFTBalance> ans, String userId, String contractAddress, String tokenId) {
-        NFTBalance nftBalance;
-        BigInteger balance;
-        try {
-            balance = erc1155Contract.balanceOf(userId, contractAddress, new BigInteger(tokenId));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        if (balance != null) {
-            nftBalance = new NFTBalance();
-            nftBalance.setAddress(userId);
-            nftBalance.setAmount(balance.toString());
-            nftBalance.setTokenId(tokenId);
-            nftBalance.setContract(contractAddress);
-            nftBalance.setStd("1155");
-            ans.add(nftBalance);
-        }
+    private List<NFTBalance> addNFTBalance(List<NFTBalance> ans, String userId, String contractAddress, String tokenId) throws IOException {
+        BigInteger balance = erc1155Contract.balanceOf(userId, contractAddress, new BigInteger(tokenId));
+        NFTBalance nftBalance = new NFTBalance();
+        nftBalance.setAddress(userId);
+        nftBalance.setAmount(balance.toString());
+        nftBalance.setTokenId(tokenId);
+        nftBalance.setContract(contractAddress);
+        nftBalance.setStd("1155");
+        ans.add(nftBalance);
         return ans;
     }
 }
