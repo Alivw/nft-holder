@@ -48,12 +48,14 @@ public class TConsumer extends Thread {
         if (retryTimes > 0) {
             try {
                 doRun(logs);
+            } catch (RuntimeException e) {
+                log.error("handle {} throws exception", blockNumber, e);
+                System.exit(500);
             } catch (Exception e) {
                 log.error("handle {} throws exception,retry times = {}", blockNumber, retryTimes, e);
                 doRun(logs, --retryTimes);
             }
         } else {
-            log.error("handle {} throws exception", blockNumber);
             System.exit(500);
         }
 
